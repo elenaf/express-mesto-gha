@@ -13,17 +13,16 @@ const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-    /* if (!user) throw new Error('not found'); */
+    if (!user) throw new Error('not found');
     return res.status(200).send(user);
   } catch (err) {
-    const { userId } = req.params;
     if (err.name === 'CastError') {
       return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
     }
-    // if (err.message === 'not found') {return res.status(404).send({ message: 'Не найден' })}
-    if (User.findById(userId) === null) {
-      return res.status(404).send({ message: 'Такой пользователь не найден' });
+    if (err.message === 'not found') {
+      return res.status(404).send({ message: 'Пользователь не найден' });
     }
+
     return res.status(500).send();
   }
 };
@@ -41,14 +40,21 @@ const createUser = async (req, res) => {
   }
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = async (req, res) => {
   try {
-    const { name, about } = req.body;
     const userId = req.user._id;
-    User.findByIdAndUpdate(userId, { name, about });
-    res.send(req.body);
+    const { name, about } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, about },
+      { new: true, runValidators: true },
+    );
+    if (!user) throw new Error('not found');
+    res.status(200).send(user);
   } catch (err) {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
+    if (err.message === 'not found') {
+      res.status(404).send({ message: 'Пользователь не найден' });
+    } else if (err.name === 'ValidationError' || err.name === 'CastError') {
       res.status(400).send({ message: 'Некорректные данные' });
     } else {
       res.status(500).send({ message: 'Error' });
@@ -56,14 +62,21 @@ const updateProfile = (req, res) => {
   }
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = async (req, res) => {
   try {
-    const { avatar } = req.body;
     const userId = req.user._id;
-    User.findByIdAndUpdate(userId, { avatar });
-    res.send(req.body);
+    const { avatar } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar },
+      { new: true, runValidators: true },
+    );
+    if (!user) throw new Error('not found');
+    res.status(200).send(user);
   } catch (err) {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
+    if (err.message === 'not found') {
+      res.status(404).send({ message: 'Пользователь не найден' });
+    } else if (err.name === 'ValidationError' || err.name === 'CastError') {
       res.status(400).send({ message: 'Некорректные данные' });
     } else {
       res.status(500).send({ message: 'Error' });
