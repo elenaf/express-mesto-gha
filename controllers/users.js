@@ -13,11 +13,16 @@ const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-    if (!user) throw new Error({ status: '404', message: 'Пользователь не найден' });
+    /* if (!user) throw new Error('not found'); */
     return res.status(200).send(user);
   } catch (err) {
+    const { userId } = req.params;
     if (err.name === 'CastError') {
-      return res.status(400).send({ message: 'Неверный ID', ...err });
+      return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
+    }
+    // if (err.message === 'not found') {return res.status(404).send({ message: 'Не найден' })}
+    if (User.findById(userId) === null) {
+      return res.status(404).send({ message: 'Такой пользователь не найден' });
     }
     return res.status(500).send();
   }
