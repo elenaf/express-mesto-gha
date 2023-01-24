@@ -11,7 +11,9 @@ const getCards = async (req, res) => {
 
 const createCard = async (req, res) => {
   try {
-    const newCard = await new Card(req.body);
+    const owner = req.user._id;
+    const { name, link } = req.body;
+    const newCard = await new Card({ name, link, owner });
     res.status(201).send(await newCard.save());
   } catch (err) {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -26,14 +28,17 @@ const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     const card = Card.findByIdAndRemove(cardId);
-    if (!card) throw new Error({ status: 'not found', message: 'Такой карточки нет' });
+    if (!card) throw new Error('not found');
     return res.status(200).send(card);
   } catch (err) {
     const { cardId } = req.params;
     if (!Card.findById(cardId).owner.equals(req.user._id)) {
       return res.status(403).send({ message: 'Попытка удалить чужую карточку' });
     }
-    if (Card.findById(cardId) === null) {
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
+    }
+    if (err.message === 'not found') {
       return res.status(404).send({ message: 'Карточка не найдена' });
     }
     return res.status(500).send({ message: 'Error' });
@@ -42,15 +47,19 @@ const deleteCard = async (req, res) => {
 
 const likeCard = async (req, res) => {
   try {
-    Card.findByIdAndUpdate(
+    const card = Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     );
-    return res.status(200).send(Card.findById(req.params.cardId));
+    if (!card) throw new Error('not found');
+    return res.status(200).send(card);
   } catch (err) {
-    if (Card.findById(req.params.cardId) === null) {
-      return res.status(404).send({ message: 'Карточка не найдена' });
+    if (err.message === 'not found') {
+      return res.status(404).send({ message: 'Карточка не найден' });
+    }
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
     }
     return res.status(500).send({ message: 'Error' });
   }
@@ -58,15 +67,19 @@ const likeCard = async (req, res) => {
 
 const dislikeCard = async (req, res) => {
   try {
-    Card.findByIdAndUpdate(
+    const card = Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     );
+    if (!card) throw new Error('not found');
     return res.status(200).send(Card.findById(req.params.cardId));
   } catch (err) {
-    if (Card.findById(req.params.cardId) === null) {
-      return res.status(404).send({ message: 'Карточка не найдена' });
+    if (err.message === 'not found') {
+      return res.status(404).send({ message: 'Карточка не найден' });
+    }
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
     }
     return res.status(500).send({ message: 'Error' });
   }
