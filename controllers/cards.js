@@ -27,7 +27,7 @@ const createCard = async (req, res) => {
 const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
-    const card = Card.findByIdAndRemove(cardId);
+    const card = await Card.findByIdAndRemove(cardId);
     if (!card) throw new Error('not found');
     return res.status(200).send(card);
   } catch (err) {
@@ -47,11 +47,13 @@ const deleteCard = async (req, res) => {
 
 const likeCard = async (req, res) => {
   try {
-    const card = Card.findByIdAndUpdate(
+    console.log(`CARD ID ${req.params.cardId}`);
+    console.log(`USER ID ${req.user._id}`);
+    const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
-    );
+    ).populate('likes');
     if (!card) throw new Error('not found');
     return res.status(200).send(card);
   } catch (err) {
@@ -67,7 +69,7 @@ const likeCard = async (req, res) => {
 
 const dislikeCard = async (req, res) => {
   try {
-    const card = Card.findByIdAndUpdate(
+    const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
