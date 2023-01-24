@@ -35,11 +35,11 @@ const deleteCard = async (req, res) => {
     if (err.message === 'not found') {
       return res.status(404).send({ message: 'Карточка не найдена' });
     }
-    if (!Card.findById(cardId).owner.equals(req.user._id)) {
-      return res.status(403).send({ message: 'Попытка удалить чужую карточку' });
-    }
     if (err.name === 'CastError') {
       return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
+    }
+    if (!Card.findById(cardId).owner.equals(req.user._id)) {
+      return res.status(403).send({ message: 'Попытка удалить чужую карточку' });
     }
     return res.status(500).send({ message: 'Error' });
   }
