@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');/*
-const user = require('./User'); */
+const mongoose = require('mongoose');
 
 // Создали схему
 const cardSchema = new mongoose.Schema({

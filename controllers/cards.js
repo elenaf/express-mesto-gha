@@ -27,18 +27,24 @@ const createCard = async (req, res) => {
 const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findByIdAndRemove(cardId);
-    if (!card) throw new Error('not found');
+    const card = await Card.findById(cardId);
+    if (!card) {
+      throw new Error('NotFound');
+    }
+    if (!card.owner.equals(req.user._id)) {
+      throw new Error('Conflict');
+    }
+
+    await Card.deleteOne(card);
     return res.status(200).send(card);
   } catch (err) {
-    const { cardId } = req.params;
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       return res.status(404).send({ message: 'Карточка не найдена' });
     }
     if (err.name === 'CastError') {
       return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
     }
-    if (!Card.findById(cardId).owner.equals(req.user._id)) {
+    if (err.message === 'Conflict') {
       return res.status(403).send({ message: 'Попытка удалить чужую карточку' });
     }
     return res.status(500).send({ message: 'Error' });
@@ -52,10 +58,10 @@ const likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     ).populate('likes');
-    if (!card) throw new Error('not found');
+    if (!card) throw new Error('NotFound');
     return res.status(200).send(card);
   } catch (err) {
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       return res.status(404).send({ message: 'Карточка не найдена' });
     }
     if (err.name === 'CastError') {
@@ -72,10 +78,10 @@ const dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     ).populate('likes');
-    if (!card) throw new Error('not found');
+    if (!card) throw new Error('NotFound');
     return res.status(200).send(card);
   } catch (err) {
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       return res.status(404).send({ message: 'Карточка не найдена' });
     }
     if (err.name === 'CastError') {

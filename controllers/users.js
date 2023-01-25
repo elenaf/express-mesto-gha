@@ -13,13 +13,13 @@ const getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-    if (!user) throw new Error('not found');
+    if (!user) throw new Error('NotFound');
     return res.status(200).send(user);
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
     }
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       return res.status(404).send({ message: 'Пользователь не найден' });
     }
 
@@ -49,10 +49,10 @@ const updateProfile = async (req, res) => {
       { name, about },
       { new: true, runValidators: true },
     );
-    if (!user) throw new Error('not found');
+    if (!user) throw new Error('NotFound');
     res.status(200).send(user);
   } catch (err) {
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       res.status(404).send({ message: 'Пользователь не найден' });
     } else if (err.name === 'ValidationError' || err.name === 'CastError') {
       res.status(400).send({ message: 'Некорректные данные' });
@@ -71,10 +71,10 @@ const updateAvatar = async (req, res) => {
       { avatar },
       { new: true, runValidators: true },
     );
-    if (!user) throw new Error('not found');
+    if (!user) throw new Error('NotFound');
     res.status(200).send(user);
   } catch (err) {
-    if (err.message === 'not found') {
+    if (err.message === 'NotFound') {
       res.status(404).send({ message: 'Пользователь не найден' });
     } else if (err.name === 'ValidationError' || err.name === 'CastError') {
       res.status(400).send({ message: 'Некорректные данные' });
