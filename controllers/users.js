@@ -1,11 +1,18 @@
 const User = require('../models/User');
+const {
+  OK,
+  CREATED,
+  BAD_REQUEST,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} = require('../utils/constants');
 
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.status(200).send(users);
+    res.status(OK).send(users);
   } catch (err) {
-    res.status(500).send({ message: 'Error' });
+    res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -14,28 +21,28 @@ const getUserById = async (req, res) => {
     const { userId } = req.params;
     const user = await User.findById(userId);
     if (!user) throw new Error('NotFound');
-    return res.status(200).send(user);
+    return res.status(OK).send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(400).send({ message: 'Ошибка валидации ID', ...err });
+      return res.status(BAD_REQUEST).send({ message: 'Ошибка валидации ID', ...err });
     }
     if (err.message === 'NotFound') {
-      return res.status(404).send({ message: 'Пользователь не найден' });
+      return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     }
 
-    return res.status(500).send();
+    return res.status(INTERNAL_SERVER_ERROR).send();
   }
 };
 
 const createUser = async (req, res) => {
   try {
     const newUser = await new User(req.body);
-    res.status(201).send(await newUser.save());
+    res.status(CREATED).send(await newUser.save());
   } catch (err) {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(400).send({ message: 'Некорректные данные' });
+    if (err.name === 'ValidationError') {
+      res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     } else {
-      res.status(500).send({ message: 'Error' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
     }
   }
 };
@@ -50,14 +57,14 @@ const updateProfile = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!user) throw new Error('NotFound');
-    res.status(200).send(user);
+    res.status(OK).send(user);
   } catch (err) {
     if (err.message === 'NotFound') {
-      res.status(404).send({ message: 'Пользователь не найден' });
-    } else if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(400).send({ message: 'Некорректные данные' });
+      res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+    } else if (err.name === 'ValidationError') {
+      res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     } else {
-      res.status(500).send({ message: 'Error' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
     }
   }
 };
@@ -72,14 +79,14 @@ const updateAvatar = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!user) throw new Error('NotFound');
-    res.status(200).send(user);
+    res.status(OK).send(user);
   } catch (err) {
     if (err.message === 'NotFound') {
-      res.status(404).send({ message: 'Пользователь не найден' });
-    } else if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(400).send({ message: 'Некорректные данные' });
+      res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+    } else if (err.name === 'ValidationError') {
+      res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     } else {
-      res.status(500).send({ message: 'Error' });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
     }
   }
 };
