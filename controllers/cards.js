@@ -10,7 +10,7 @@ const {
 
 const getCards = async (req, res) => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}).populate('owner');
     res.status(OK).send(cards);
   } catch (err) {
     res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
