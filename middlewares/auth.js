@@ -1,15 +1,18 @@
 // мидлвэр авторизации
 const jwt = require('jsonwebtoken');
 
-const { resStatuses } = require('../utils/constants');
+// const { resStatuses } = require('../utils/constants');
 
-const { UNAUTHORIZED, INTERNAL_SERVER_ERROR } = resStatuses;
+// const { UNAUTHORIZED, INTERNAL_SERVER_ERROR } = resStatuses;
+
+const UnauthorizedError = require('../errors/unauthorized-err');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(UNAUTHORIZED).send({ message: 'Необходима авторизация' });
+    throw new UnauthorizedError('Необходима авторизация');
+    // return res.status(UNAUTHORIZED).send({ message: 'Необходима авторизация' });
   }
 
   // извлечем токен
@@ -20,9 +23,11 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, 'secret');
   } catch (err) {
     if (err.name === 'JsonWebTokenError') {
-      return res.status(UNAUTHORIZED).send({ message: 'Нет доступа' });
+      throw new UnauthorizedError('Нет доступа');
+      // return res.status(UNAUTHORIZED).send({ message: 'Нет доступа' });
     }
-    return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
+    next(err);
+    // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка сервера' });
   }
 
   req.user = payload; // записали пейлоуд в объект запроса
