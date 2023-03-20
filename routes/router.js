@@ -2,9 +2,9 @@ const express = require('express'); // подключили express
 
 const { celebrate, Joi } = require('celebrate');
 
-const {
+/* const {
   NOT_FOUND,
-} = require('../utils/constants');
+} = require('../utils/constants'); */
 
 const router = express.Router(); // создали объект роута
 const usersRoutes = require('./users');
@@ -12,6 +12,7 @@ const cardsRoutes = require('./cards');
 
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
+const NotFoundError = require('../errors/not-found-err');
 
 // роутинг для логина
 router.post('/signin', express.json(), celebrate({
@@ -49,7 +50,8 @@ router.use('/cards', cardsRoutes);
 
 // обработка несуществующего пути
 router.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
+  throw new NotFoundError('Страница не найдена');
+  // res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
 });
 
 module.exports = router;
