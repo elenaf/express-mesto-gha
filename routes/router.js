@@ -1,5 +1,7 @@
 const express = require('express'); // подключили express
 
+const { celebrate, Joi } = require('celebrate');
+
 const {
   NOT_FOUND,
 } = require('../utils/constants');
@@ -7,6 +9,31 @@ const {
 const router = express.Router(); // создали объект роута
 const usersRoutes = require('./users');
 const cardsRoutes = require('./cards');
+
+const { login, createUser } = require('../controllers/users');
+const auth = require('../middlewares/auth');
+
+// роутинг для логина
+router.post('/signin', express.json(), celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }), /*
+  headers: Joi.object().keys({
+    Authorization: Joi.string().required(),
+  }).unknown(true), */
+}), login);
+
+// роутинг для создания пользователя
+router.post('/signup', express.json(), celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
+
+// роутинг для авторизации
+router.use(auth);
 
 // роутинг для пользователей
 router.use('/users', usersRoutes);

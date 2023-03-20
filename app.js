@@ -1,19 +1,26 @@
 // функциональность точки входа
+const { errors } = require('celebrate');
 const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./routes/router'); // импортируем роутер
 
 const app = express();
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '63c5c9d47182fab491a733a8', // _id созданного пользователя
-  };
-
-  next();
-});
-
 app.use(router); // запускаем роутер.
+
+// обработчик ошибок celebrate
+app.use(errors());
+
+// миддлвэр обработки ошибок
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'Ошибка сервера'
+      : message,
+  });
+  next(); // это мне кажется убрать надо, нафиг тут некст?
+});
 
 // подключение к базе данных
 async function connect() {
