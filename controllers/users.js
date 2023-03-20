@@ -89,11 +89,9 @@ const createUser = async (req, res, next) => {
   } = req.body;
   if (!email) {
     throw new BadRequestError('Введите email');
-    // return res.status(BAD_REQUEST).send({ message: 'Введите email' });
   }
   if (!password) {
     throw new BadRequestError('Введите пароль');
-    // return res.status(BAD_REQUEST).send({ message: 'Введите пароль' });
   }
   try {
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -105,18 +103,15 @@ const createUser = async (req, res, next) => {
       email,
       password: hash,
     });
-    /* return  */res.status(CREATED).send(await newUser.save());
+    res.status(CREATED).send(await (await newUser.save()).toJSON());
   } catch (err) {
     if (err.code === MONGO_DUPLICATE_ERROR_CODE) {
       next(new ConflictError('Данный email уже используется'));
-      // return res.status(CONFLICT).send({ message: 'Данный email уже используется' });
     }
     if (err.name === 'ValidationError') {
       next(new BadRequestError('Некорректные данные'));
-      // return res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     }
-    next(new InternalServerError('Ошибка сервера'));
-    // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
+    next(err);
   }
 };
 
