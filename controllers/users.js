@@ -190,8 +190,11 @@ const login = async (req, res, next) => {
   } catch (err) {
     if (err.message === 'Unauthorized') {
       next(new UnauthorizedError('Некорректный email или пароль'));
-      // return res.status(UNAUTHORIZED).send({ message: 'Некорректный email или пароль' });
+    } else if (err.name === 'ValidationError') {
+      next(new BadRequestError('Некорректный email или пароль'));
     }
+
+    // return res.status(UNAUTHORIZED).send({ message: 'Некорректный email или пароль' });
     next(new InternalServerError('Ошибка сервера'));
     // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
