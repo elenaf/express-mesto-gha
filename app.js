@@ -8,7 +8,7 @@ const router = require('./routes/router'); // импортируем роуте�
 const app = express();
 
 dotenv.config();
-const { PORT = 3000, DATABASE_URL } = process.env;
+const { PORT, DATABASE_URL } = process.env;
 
 app.use(router); // запускаем роутер.
 
