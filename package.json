@@ -14,7 +14,7 @@
     "url": "git+https://github.com/elenaf/express-mesto-gha.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Elena Fedotova",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/elenaf/express-mesto-gha/issues"
@@ -23,6 +23,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "celebrate": "^15.0.1",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.8.1",

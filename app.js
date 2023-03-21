@@ -2,9 +2,13 @@
 const { errors } = require('celebrate');
 const express = require('express');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const router = require('./routes/router'); // импортируем роутер
 
 const app = express();
+
+dotenv.config();
+const { PORT = 3000, DATABASE_URL } = process.env;
 
 app.use(router); // запускаем роутер.
 
@@ -24,8 +28,8 @@ app.use((err, req, res, next) => {
 
 // подключение к базе данных
 async function connect() {
-  await mongoose.connect('mongodb://localhost:27017/mestodb'); // подключаемся к БД
-  await app.listen(3000);
+  await mongoose.connect(DATABASE_URL); // подключаемся к БД
+  await app.listen(PORT);
 }
 
 connect();
