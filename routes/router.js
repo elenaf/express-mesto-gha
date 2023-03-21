@@ -49,7 +49,7 @@ router.use('/users', usersRoutes);
 router.use('/cards', cardsRoutes);
 
 // обработка несуществующего пути
-router.use((req, res) => {
+router.use(() => {
   throw new NotFoundError('Страница не найдена');
   // res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
 });
