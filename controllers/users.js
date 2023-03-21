@@ -54,7 +54,7 @@ const getUserById = async (req, res, next) => {
       next(new NotFoundError('Пользователь не найден'));
       // return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     }
-    next(new InternalServerError('Ошибка сервера'));
+    next(err);
     // return res.status(INTERNAL_SERVER_ERROR).send();
   }
 };
@@ -74,7 +74,7 @@ const getCurrentUser = async (req, res, next) => {
       next(new NotFoundError('Пользователь не найден'));
       // return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     }
-    next(new InternalServerError('Ошибка сервера'));
+    next(err);
     // return res.status(INTERNAL_SERVER_ERROR).send();
   }
 };
@@ -133,10 +133,9 @@ const updateProfile = async (req, res, next) => {
     } else if (err.name === 'ValidationError') {
       next(new BadRequestError('Некорректные данные'));
       // res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
-    } else {
-      next(new InternalServerError('Ошибка сервера'));
-      // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
     }
+    next(err);
+    // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -158,10 +157,9 @@ const updateAvatar = async (req, res, next) => {
     } else if (err.name === 'ValidationError') {
       next(new BadRequestError('Некорректные данные'));
       // res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
-    } else {
-      next(new InternalServerError('Ошибка сервера'));
-      // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
     }
+    next(err);
+    // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -195,7 +193,7 @@ const login = async (req, res, next) => {
     }
 
     // return res.status(UNAUTHORIZED).send({ message: 'Некорректный email или пароль' });
-    next(new InternalServerError('Ошибка сервера'));
+    next(err);
     // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
