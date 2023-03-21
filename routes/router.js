@@ -2,10 +2,6 @@ const express = require('express'); // подключили express
 
 const { celebrate, Joi } = require('celebrate');
 
-/* const {
-  NOT_FOUND,
-} = require('../utils/constants'); */
-
 const router = express.Router(); // создали объект роута
 const usersRoutes = require('./users');
 const cardsRoutes = require('./cards');
@@ -51,7 +47,6 @@ router.use('/cards', cardsRoutes);
 // обработка несуществующего пути
 router.use(() => {
   throw new NotFoundError('Страница не найдена');
-  // res.status(NOT_FOUND).send({ message: 'Страница не найдена' });
 });
 
 module.exports = router;

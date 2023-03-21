@@ -5,8 +5,6 @@ const User = require('../models/User');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const ConflictError = require('../errors/conflict-err');
-// const ForbiddenError = require('../errors/forbidden-err');
-const InternalServerError = require('../errors/internal-server-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
 const {
@@ -18,11 +16,6 @@ const {
 const {
   OK,
   CREATED,
-  /* BAD_REQUEST,
-  UNAUTHORIZED,
-  NOT_FOUND,
-  CONFLICT,
-  INTERNAL_SERVER_ERROR, */
 } = resStatuses;
 
 const {
@@ -35,7 +28,6 @@ const getUsers = async (req, res, next) => {
     res.status(OK).send(users);
   } catch (err) {
     next(err);
-    // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -44,18 +36,15 @@ const getUserById = async (req, res, next) => {
     const { userId } = req.params;
     const user = await User.findById(userId);
     if (!user) throw new NotFoundError('Пользователь не найден');
-    /* return  */res.status(OK).send(user);
+    res.status(OK).send(user);
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Ошибка валидации ID'));
-      // return res.status(BAD_REQUEST).send({ message: 'Ошибка валидации ID', ...err });
     }
     if (err.message === 'NotFound') {
       next(new NotFoundError('Пользователь не найден'));
-      // return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     }
     next(err);
-    // return res.status(INTERNAL_SERVER_ERROR).send();
   }
 };
 
@@ -64,18 +53,15 @@ const getCurrentUser = async (req, res, next) => {
     const userId = req.user._id;
     const user = await User.findById(userId);
     if (!user) throw new NotFoundError('NotFound');
-    /* return  */res.status(OK).send(user);
+    res.status(OK).send(user);
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Ошибка валидации ID'));
-      // return res.status(BAD_REQUEST).send({ message: 'Ошибка валидации ID', ...err });
     }
     if (err.message === 'NotFound') {
       next(new NotFoundError('Пользователь не найден'));
-      // return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     }
     next(err);
-    // return res.status(INTERNAL_SERVER_ERROR).send();
   }
 };
 
@@ -129,13 +115,10 @@ const updateProfile = async (req, res, next) => {
   } catch (err) {
     if (err.message === 'NotFound') {
       next(new NotFoundError('Некорректные данные'));
-      // res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     } else if (err.name === 'ValidationError') {
       next(new BadRequestError('Некорректные данные'));
-      // res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     }
     next(err);
-    // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -153,13 +136,10 @@ const updateAvatar = async (req, res, next) => {
   } catch (err) {
     if (err.message === 'NotFound') {
       next(new NotFoundError('Пользователь не найден'));
-      // res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
     } else if (err.name === 'ValidationError') {
       next(new BadRequestError('Некорректные данные'));
-      // res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
     }
     next(err);
-    // res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
@@ -171,11 +151,9 @@ const login = async (req, res, next) => {
 
   if (!email) {
     throw new BadRequestError('Введите email');
-    // return res.status(BAD_REQUEST).send({ message: 'Введите email' });
   }
   if (!password) {
     throw new BadRequestError('Введите пароль');
-    // return res.status(BAD_REQUEST).send({ message: 'Введите пароль' });
   }
 
   try {
@@ -184,7 +162,7 @@ const login = async (req, res, next) => {
     const passMatch = await bcrypt.compare(password, user.password);
     if (!passMatch) throw new UnauthorizedError('Unauthorized');
     const token = jwt.sign({ _id: user._id }, 'secret', { expiresIn: '7d' });
-    /* return  */res.status(OK).send({ message: 'Welcome!', token });
+    res.status(OK).send({ message: 'Welcome!', token });
   } catch (err) {
     if (err.message === 'Unauthorized') {
       next(new UnauthorizedError('Некорректный email или пароль'));
@@ -192,9 +170,7 @@ const login = async (req, res, next) => {
       next(new BadRequestError('Некорректный email или пароль'));
     }
 
-    // return res.status(UNAUTHORIZED).send({ message: 'Некорректный email или пароль' });
     next(err);
-    // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error' });
   }
 };
 
