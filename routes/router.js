@@ -17,7 +17,7 @@ const NotFoundError = require('../errors/not-found-err');
 // роутинг для логина
 router.post('/signin', express.json(), celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
@@ -31,7 +31,7 @@ router.post('/signin', express.json(), celebrate({
 // роутинг для создания пользователя
 router.post('/signup', express.json(), celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
