@@ -3,6 +3,14 @@ const express = require('express'); // подключили express
 const usersRoutes = require('express').Router(); // создание объекта роута
 
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
+
+const validateUrl = (value, helpers) => {
+  if (!validator.isURL(value)) {
+    return helpers.error('Invalid url');
+  }
+  return value;
+};
 
 const {
   getUsers,
@@ -27,7 +35,7 @@ usersRoutes.patch('/me', express.json(), celebrate({
 }), updateProfile);
 usersRoutes.patch('/me/avatar', express.json(), celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().custom(validateUrl),
   }),
 }), updateAvatar);
 
