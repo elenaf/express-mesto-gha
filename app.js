@@ -4,13 +4,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const router = require('./routes/router'); // импортируем роутер
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
 dotenv.config();
 const { PORT, DATABASE_URL } = process.env;
 
+app.use(requestLogger); // подключаем логгер запросов
+
 app.use(router); // запускаем роутер.
+
+app.use(errorLogger); // подключаем логгер ошибок
 
 // обработчик ошибок celebrate
 app.use(errors());
